@@ -507,6 +507,20 @@ def customer_dashboard_view(request):
     }
     return render(request,'vehicle/customer_dashboard.html',context=dict)
 
+@login_required(login_url='customerlogin')
+@user_passes_test(is_customer)
+def customer_work_details_view(request, status):
+    customer = models.Customer.objects.get(user_id=request.user.id)
+
+    # Fetch works based on status
+    works = models.Request.objects.filter(customer_id=customer.id, status=status).select_related('mechanic')
+
+    return render(request, 'vehicle/customer_work_details.html', {
+        'works': works,
+        'status': status,
+    })
+
+
 
 @login_required(login_url='customerlogin')
 @user_passes_test(is_customer)

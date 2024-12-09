@@ -1,4 +1,4 @@
-{% extends 'vehicle/mechanicbase.html' %}
+{% extends 'vehicle/customerbase.html' %}
 {% block content %}
 
 <h2 style="text-align: center; margin-top: 20px;">Work Details - {{ status }}</h2>
@@ -7,34 +7,42 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>Customer Name</th>
             <th>Vehicle Info</th>
             <th>Vehicle No</th>
             <th>Vehicle Brand</th>
             <th>Problem Description</th>
-            <th>Service Date</th>
+            <th>Assigned Mechanic</th>
+            <th>Mechanic Phone</th>
             <th>Status</th>
-            <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for work in works %}
         <tr>
             <td>{{ work.id }}</td>
-            <td>{{ work.customer.user.first_name }} {{ work.customer.user.last_name }}</td>
             <td>{{ work.vehicle_name }} ({{ work.vehicle_model }})</td>
             <td>{{ work.vehicle_no }}</td>
             <td>{{ work.vehicle_brand }}</td>
             <td>{{ work.problem_description }}</td>
-            <td>{{ work.date }}</td>
-            <td>{{ work.status }}</td>
             <td>
-                <a href="{% url 'mechanic-update-status' work.id %}" class="btn btn-success">Update</a>
+                {% if work.mechanic %}
+                    {{ work.mechanic.user.first_name }} {{ work.mechanic.user.last_name }}
+                {% else %}
+                    Not Assigned
+                {% endif %}
             </td>
+            <td>
+                {% if work.mechanic %}
+                    {{ work.mechanic.mobile }}
+                {% else %}
+                    Not Available
+                {% endif %}
+            </td>
+            <td>{{ work.status }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="10">
+            <td colspan="8">
                 <div style="text-align: center; padding: 20px; font-size: 18px; font-weight: bold;">
                     No records found.
                 </div>
@@ -44,11 +52,8 @@
     </tbody>
 </table>
 
-<!-- Return to Dashboard Button -->
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{% url 'mechanic-dashboard' %}" class="btn btn-secondary" style="display: inline-block; padding: 10px 20px; font-size: 16px;">
-        Return Home
-    </a>
-</div>
+<a href="{% url 'customer-dashboard' %}" class="btn btn-secondary" style="display: block; width: 200px; margin: 20px auto; text-align: center;">
+    Back to Dashboard
+</a>
 
 {% endblock %}
