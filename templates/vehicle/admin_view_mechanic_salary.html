@@ -27,7 +27,7 @@
 							<tbody>
               {% for m in mechanics %}
                 <tr>
-                  <td> {{m.get_name}}</td>
+					<td>{{ m.user.first_name }} {{ m.user.last_name }}</td>
 
                   <td>{{m.salary}}</td>
                   <td><a  style="color:blue; text-decoration:none;font-size:25px;" href="{% url 'update-salary' m.id  %}">&#9998;</a></td>

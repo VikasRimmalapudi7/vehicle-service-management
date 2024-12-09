@@ -68,7 +68,7 @@
           {% csrf_token %}
           {%for m in mechanics%}
           <tr>
-            <td>{{m.get_name}}</td>
+            <td>{{ m.user.first_name }} {{ m.user.last_name }}</td>
             <td>{{aform.present_status}}</td>
           </tr>
           {%endfor%}

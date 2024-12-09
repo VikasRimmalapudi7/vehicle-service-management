@@ -1,0 +1,16 @@
+1.customer can direclty create their account
+2.mechanic can create their account but admin approval is needed
+
+
+imp features
+
+3.requests raised by customer from one particular location should go to mechanic in that location only
+4.currently work assigned,rapairing are static it should be dynamic and it should show the status in both mechanic and customer page
+5.mechanic should have access to change the status of work he has done,but customer should not
+mehchanic and customer names are not rendering properly(bug should be fixed)
+logout functionality is not there
+add redirection in the admin page for total customer total mechanic
+
+
+bill section is not working
+admin dashboard needs to be optimised

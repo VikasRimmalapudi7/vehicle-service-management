@@ -27,7 +27,7 @@
 							<tbody>
                 {% for c,r in data %}
                 <tr>
-                  <td> {{c.get_name}}</td>
+					<td>{{ c.user.first_name }} {{ c.user.last_name }}</td>
                   <td> {{r.vehicle_no}}</td>
                   <td> {{r.date}}</td>
                   <td>{{r.problem_description}}</td>
