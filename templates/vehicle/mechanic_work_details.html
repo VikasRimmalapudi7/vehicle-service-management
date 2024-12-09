@@ -44,10 +44,20 @@
     </tbody>
 </table>
 
-<!-- Return to Dashboard Button -->
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{% url 'mechanic-dashboard' %}" class="btn btn-secondary" style="display: inline-block; padding: 10px 20px; font-size: 16px;">
-        Return Home
+<div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+    <a href="{% url 'mechanic-dashboard' %}" style="
+        display: inline-block;
+        width: 200px;
+        padding: 12px 20px;
+        text-align: center;
+        text-decoration: none;
+        background-color: #3B82F6;
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    ">
+        Back to Dashboard
     </a>
 </div>
 

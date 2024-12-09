@@ -6,7 +6,10 @@ class Customer(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pic/CustomerProfilePic/', null=True, blank=True)
     address = models.CharField(max_length=40)
     mobile = models.CharField(max_length=20, null=False)
-    address = models.CharField(max_length=100, null=True, blank=True)  # New fiel
+    address = models.CharField(max_length=100, null=True, blank=True)  
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
+
 
 class Mechanic(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -17,6 +20,8 @@ class Mechanic(models.Model):
     salary = models.PositiveIntegerField(null=True)
     status = models.BooleanField(default=False)
     address = models.CharField(max_length=100, null=True, blank=True)
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
 
 
 class Request(models.Model):

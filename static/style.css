@@ -263,11 +263,18 @@ body {
 	border-top: 1px solid var(--second-bg-color);
 }
 
-.overlay-scrollbar::-webkit-scrollbar {
-	width: 9px;
-	height: 9px;
+.overlay-scrollbar {
+	overflow: auto;
+  }
+
+.navbar .nav-link:hover {
+	color: #007BFF;
 }
 
+.sidebar-nav-item:hover .sidebar-nav-link {
+	background-color: #f8f9fa;
+	transition: background-color 0.3s ease;
+}
 .scrollbar-hover::-webkit-scrollbar {
 	display: none;
 }

@@ -92,6 +92,7 @@ urlpatterns = [
 
 
     path('afterlogin', views.afterlogin_view,name='afterlogin'),
+    
     path('logout', LogoutView.as_view(template_name='vehicle/index.html'),name='logout'),
 
     path('aboutus', views.aboutus_view),
