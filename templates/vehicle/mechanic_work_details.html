@@ -1,0 +1,43 @@
+{% extends 'vehicle/mechanicbase.html' %}
+{% block content %}
+
+<h2>Work Details - {{ status }}</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Vehicle Info</th>
+            <th>Vehicle No</th>
+            <th>Vehicle Brand</th>
+            <th>Problem Description</th>
+            <th>Service Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for work in works %}
+        <tr>
+            <td>{{ work.id }}</td>
+            <td>{{ work.customer.user.first_name }} {{ work.customer.user.last_name }}</td>
+            <td>{{ work.vehicle_name }} ({{ work.vehicle_model }})</td>
+            <td>{{ work.vehicle_no }}</td>
+            <td>{{ work.vehicle_brand }}</td>
+            <td>{{ work.problem_description }}</td>
+            <td>{{ work.date }}</td>
+            <td>{{ work.status }}</td>
+            <td>
+                <a href="{% url 'mechanic-update-status' work.id %}" class="btn btn-success">Update</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="10">No records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

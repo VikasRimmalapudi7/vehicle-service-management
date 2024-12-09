@@ -32,10 +32,10 @@ class Request(models.Model):
     cost = models.PositiveIntegerField(null=True)
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
     mechanic = models.ForeignKey('Mechanic', on_delete=models.CASCADE, null=True)
-    stat = (('Pending', 'Pending'), ('Approved', 'Approved'), ('Repairing', 'Repairing'), 
-            ('Repairing Done', 'Repairing Done'), ('Released', 'Released'))
+    stat = (('Approved', 'Approved'), ('Repairing', 'Repairing'), 
+            ('Repairing Done', 'Repairing Done'))
     status = models.CharField(max_length=50, choices=stat, default='Pending', null=True)
-    address = models.CharField(max_length=100, null=True, blank=True)  # New field
+    address = models.CharField(max_length=100, null=True, blank=True)  
 
 class Attendance(models.Model):
     mechanic=models.ForeignKey('Mechanic',on_delete=models.CASCADE,null=True)

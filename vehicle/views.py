@@ -646,16 +646,60 @@ def mechanic_dashboard_view(request):
 
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
+def mechanic_work_details_view(request, status):
+    mechanic = models.Mechanic.objects.get(user_id=request.user.id)
+    works = models.Request.objects.filter(mechanic_id=mechanic.id, status=status)
+    
+    context = {
+        'works': works,
+        'status': status,
+        'mechanic': mechanic,
+    }
+    return render(request, 'vehicle/mechanic_work_details.html', context)
 
+@login_required(login_url='mechaniclogin')
+@user_passes_test(is_mechanic)
+def mechanic_update_status_view(request, pk):
+    # Get the mechanic
+    mechanic = models.Mechanic.objects.get(user_id=request.user.id)
+
+    # Fetch the request object
+    try:
+        request_obj = models.Request.objects.get(id=pk)
+    except models.Request.DoesNotExist:
+        return redirect('mechanic-work-assigned')  # Handle invalid access
+
+    if request.method == 'POST':
+        updateStatus = forms.MechanicUpdateStatusForm(request.POST, instance=request_obj)
+        if updateStatus.is_valid():
+            # Update mechanic assignment if not already assigned
+            if request_obj.mechanic is None:
+                request_obj.mechanic = mechanic
+
+            # Save the updated status
+            updateStatus.save()
+            return redirect('mechanic-work-assigned')
+        else:
+            print("Form Errors:", updateStatus.errors)  # Debugging
+
+    updateStatus = forms.MechanicUpdateStatusForm(instance=request_obj)
+    return render(request, 'vehicle/mechanic_update_status.html', {
+        'updateStatus': updateStatus,
+        'mechanic': mechanic,
+    })
+
+
+@login_required(login_url='mechaniclogin')
+@user_passes_test(is_mechanic)
 def mechanic_work_assigned_view(request):
     # Get the logged-in mechanic
     mechanic = models.Mechanic.objects.get(user_id=request.user.id)
 
+    # Filter works assigned to the mechanic or unassigned but matching their address
+    works = models.Request.objects.filter(
+        Q(mechanic=mechanic) | Q(mechanic=None, address=mechanic.address)
+    ).exclude(status__in=['Repairing Done', 'Released'])  # Exclude completed tasks
 
-    # Filter works based on mechanic's address and unassigned requests
-    works = models.Request.objects.filter(address=mechanic.address, mechanic=None)
-
-    
     return render(request, 'vehicle/mechanic_work_assigned.html', {
         'works': works,
         'mechanic': mechanic
@@ -663,23 +707,6 @@ def mechanic_work_assigned_view(request):
 
 
 
-@login_required(login_url='mechaniclogin')
-@user_passes_test(is_mechanic)
-def mechanic_update_status_view(request, pk):
-    mechanic = models.Mechanic.objects.get(user_id=request.user.id)
-    updateStatus = forms.MechanicUpdateStatusForm()
-    if request.method == 'POST':
-        updateStatus = forms.MechanicUpdateStatusForm(request.POST)
-        if updateStatus.is_valid():
-            enquiry_x = models.Request.objects.get(id=pk)
-            if enquiry_x.mechanic is None:  # Check if the issue is unassigned
-                enquiry_x.mechanic = mechanic
-                enquiry_x.status = updateStatus.cleaned_data['status']
-                enquiry_x.save()
-            else:
-                print("Issue already assigned to another mechanic")
-        return HttpResponseRedirect('/mechanic-work-assigned')
-    return render(request, 'vehicle/mechanic_update_status.html', {'updateStatus': updateStatus, 'mechanic': mechanic})
 
 
 @login_required(login_url='mechaniclogin')

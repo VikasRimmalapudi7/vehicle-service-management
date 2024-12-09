@@ -1,54 +1,60 @@
 {% extends 'vehicle/mechanicbase.html' %}
 {% load widget_tweaks %}
 {% block content %}
-<head>
-  <style media="screen">
-    input[type=text], select,input[type=number] , textarea{
+
+<style>
+  /* Simplified and improved styling for the form */
+  .form-container {
+    width: 60%;
+    margin: 50px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+
+  .form-container label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .form-container input[type="text"],
+  .form-container select,
+  .form-container textarea {
     width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
+    padding: 10px;
+    margin: 10px 0 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
   }
 
-  input[type=submit] {
+  .form-container input[type="submit"] {
     width: 100%;
     background-color: #4CAF50;
     color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
+    padding: 12px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
   }
 
-  input[type=submit]:hover {
+  .form-container input[type="submit"]:hover {
     background-color: #45a049;
   }
+</style>
 
+<h3 style="text-align: center; margin-top: 30px;">Update Status of Work</h3>
+<div class="form-container">
+  <form method="post">
+    {% csrf_token %}
+    <label for="status">Status</label>
+    {% render_field updateStatus.status class="form-control" %}
 
-  </style>
-
-
-</head>
-
-<br><br><br><br><br>
-<h3 style="text-align:center;">Update Status Of Work</h3>
-<div>
-  <form method="post" style="margin-left:200px;margin-right:200px;">
-      {% csrf_token %}
-
-    <label for="salary">Status</label>
-    {% render_field updateStatus.status class="form-control"  %}
-
-
-    <input type="submit" value="Update">
+    <input type="submit" value="Update Status">
   </form>
 </div>
 
-
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-{% endblock content %}
+{% endblock %}
