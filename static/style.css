@@ -15,6 +15,16 @@
 	--dark-second-background: #181818;
 }
 
+
+.counter {
+    transition: transform 0.2s ease; /* Smooth hover effect */
+}
+
+.counter:hover {
+    transform: scale(1.1); /* Enlarge hovered card */
+}
+
+
 .light {
 	--main-bg-color: var(--light-background);
 	--second-bg-color: var(--light-second-background);

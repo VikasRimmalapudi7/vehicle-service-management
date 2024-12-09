@@ -2,62 +2,71 @@
 {% load static %}
 {% block content %}
 
-	<!-- main content -->
-	<div class="wrapper">
+<!-- main content -->
+<div class="wrapper">
 
-<!-- ****** cards start ********** -->
-<div class="row">
-    <div class="col-3 col-m-6 col-sm-6">
-        <a href="{% url 'work-details' 'Approved' %}">
-            <div class="counter bg-primary">
-                <p><i class="fas fa-tasks"></i></p>
-                <h3>{{ new_work_assigned }}</h3>
-                <p>New Work Assigned</p>
-            </div>
-        </a>
+    <!-- ****** cards start ********** -->
+    <div class="row">
+        <!-- New Work Assigned -->
+        <div class="col-3 col-m-6 col-sm-6">
+            <a href="{% url 'work-details' 'Approved' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #007BFF; color: white;">
+                    <p><i class="fas fa-tasks"></i></p>
+                    <h3>{{ new_work_assigned }}</h3>
+                    <p>New Work Assigned</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Work In Progress -->
+        <div class="col-3 col-m-6 col-sm-6">
+            <a href="{% url 'work-details' 'Repairing' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #FFC107; color: black;">
+                    <p><i class="fas fa-spinner"></i></p>
+                    <h3>{{ work_in_progress }}</h3>
+                    <p>Work In Progress</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Work Completed -->
+        <div class="col-3 col-m-6 col-sm-6">
+            <a href="{% url 'work-details' 'Repairing Done' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #28A745; color: white;">
+                    <p><i class="fas fa-check-circle"></i></p>
+                    <h3>{{ work_completed }}</h3>
+                    <p>Work Completed</p>
+                </div>
+            </a>
+        </div>
     </div>
 
-    <div class="col-3 col-m-6 col-sm-6">
-        <a href="{% url 'work-details' 'Repairing' %}">
-            <div class="counter bg-warning">
-                <p><i class="fas fa-spinner"></i></p>
-                <h3>{{ work_in_progress }}</h3>
-                <p>Work In Progress</p>
-            </div>
-        </a>
-    </div>
+    <br><br><br><br>
 
-    <div class="col-3 col-m-6 col-sm-6">
-        <a href="{% url 'work-details' 'Repairing Done' %}">
-            <div class="counter bg-success">
-                <p><i class="fas fa-check-circle"></i></p>
-                <h3>{{ work_completed }}</h3>
-                <p>Work Completed</p>
-            </div>
-        </a>
-    </div>
+    <!-- Marquee Section -->
+    <marquee behavior="scroll" direction="left">
+        <img src="{% static 'images/ferrari.png' %}" width="120" height="80" alt="ferrari" />
+        <img src="{% static 'images/ford.png' %}" width="120" height="80" alt="ford" />
+        <img src="{% static 'images/lambo.png' %}" width="120" height="80" alt="lambo" />
+        <img src="{% static 'images/mahindra.png' %}" width="120" height="80" alt="mahindra" />
+        <img src="{% static 'images/tvs.png' %}" width="120" height="80" alt="tvs" />
+        <img src="{% static 'images/tata.png' %}" width="120" height="80" alt="tata" />
+        <img src="{% static 'images/hero.png' %}" width="120" height="80" alt="hero" />
+        <img src="{% static 'images/rolls.png' %}" width="120" height="80" alt="rolls" />
+        <img src="{% static 'images/suzuki.png' %}" width="120" height="80" alt="suzuki" />
+    </marquee>
+
 </div>
-<br><br><br><br>
 
-<!-- Marquee Section -->
-<marquee behavior="scroll" direction="left">
-    <img src="{% static 'images/ferrari.png' %}" width="120" height="80" alt="ferrari" />
-    <img src="{% static 'images/ford.png' %}" width="120" height="80" alt="ford" />
-    <img src="{% static 'images/lambo.png' %}" width="120" height="80" alt="lambo" />
-    <img src="{% static 'images/mahindra.png' %}" width="120" height="80" alt="mahindra" />
-    <img src="{% static 'images/tvs.png' %}" width="120" height="80" alt="tvs" />
-    <img src="{% static 'images/tata.png' %}" width="120" height="80" alt="tata" />
-    <img src="{% static 'images/hero.png' %}" width="120" height="80" alt="hero" />
-    <img src="{% static 'images/rolls.png' %}" width="120" height="80" alt="rolls" />
-    <img src="{% static 'images/suzuki.png' %}" width="120" height="80" alt="suzuki" />
-</marquee>
+<style>
+    /* Smooth hover effect for all counter cards */
+    .counter {
+        transition: transform 0.2s ease;
+    }
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<!-- ****** cards end ********** -->
+    .counter:hover {
+        transform: scale(1.1);
+    }
+</style>
 
-
-<!-- ****** cards end ********** -->
-
-
-	<!-- end main content -->
-{% endblock content %}
+{% endblock %}

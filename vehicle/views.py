@@ -492,20 +492,34 @@ def admin_feedback_view(request):
 @login_required(login_url='customerlogin')
 @user_passes_test(is_customer)
 def customer_dashboard_view(request):
-    customer=models.Customer.objects.get(user_id=request.user.id)
-    work_in_progress=models.Request.objects.all().filter(customer_id=customer.id,status='Repairing').count()
-    work_completed=models.Request.objects.all().filter(customer_id=customer.id).filter(Q(status="Repairing Done") | Q(status="Released")).count()
-    new_request_made=models.Request.objects.all().filter(customer_id=customer.id).filter(Q(status="Pending") | Q(status="Approved")).count()
-    bill=models.Request.objects.all().filter(customer_id=customer.id).filter(Q(status="Repairing Done") | Q(status="Released")).aggregate(Sum('cost'))
-    print(bill)
-    dict={
-    'work_in_progress':work_in_progress,
-    'work_completed':work_completed,
-    'new_request_made':new_request_made,
-    'bill':bill['cost__sum'],
-    'customer':customer,
+    customer = models.Customer.objects.get(user_id=request.user.id)
+    
+    # Existing counts
+    work_in_progress = models.Request.objects.filter(customer_id=customer.id, status='Repairing').count()
+    work_completed = models.Request.objects.filter(customer_id=customer.id).filter(
+        Q(status="Repairing Done") | Q(status="Released")
+    ).count()
+    new_request_made = models.Request.objects.filter(customer_id=customer.id).filter(
+        Q(status="Pending")
+    ).count()
+    bill = models.Request.objects.filter(customer_id=customer.id).filter(
+        Q(status="Repairing Done") | Q(status="Released")
+    ).aggregate(Sum('cost'))
+
+    # New logic for "Request Approved"
+    request_approved = models.Request.objects.filter(customer_id=customer.id, status='Approved').count()
+
+    # Context for the dashboard
+    dict = {
+        'work_in_progress': work_in_progress,
+        'work_completed': work_completed,
+        'new_request_made': new_request_made,
+        'bill': bill['cost__sum'],
+        'request_approved': request_approved,
+        'customer': customer,
     }
-    return render(request,'vehicle/customer_dashboard.html',context=dict)
+    return render(request, 'vehicle/customer_dashboard.html', context=dict)
+
 
 @login_required(login_url='customerlogin')
 @user_passes_test(is_customer)

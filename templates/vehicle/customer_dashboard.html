@@ -2,6 +2,11 @@
 {% load static %}
 {% block content %}
 
+<!-- Link the external CSS file -->
+<head>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
 <!-- main content -->
 <div class="wrapper">
 
@@ -9,8 +14,8 @@
     <div class="row">
         <!-- New Request Made -->
         <div class="col-3 col-m-6 col-sm-6">
-            <a href="{% url 'customer-work-details' 'Pending' %}" class="text-decoration-none">
-                <div class="counter bg-primary">
+            <a href="{% url 'customer-work-details' 'Pending' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #007BFF; color: white;">
                     <p>
                         <i class="fas fa-tasks"></i>
                     </p>
@@ -20,10 +25,23 @@
             </a>
         </div>
 
+        <!-- Request Approved -->
+        <div class="col-3 col-m-6 col-sm-6">
+            <a href="{% url 'customer-work-details' 'Approved' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #17A2B8; color: white;">
+                    <p>
+                        <i class="fas fa-thumbs-up"></i>
+                    </p>
+                    <h3>{{ request_approved }}</h3>
+                    <p>Request Approved</p>
+                </div>
+            </a>
+        </div>
+
         <!-- Work In Progress -->
         <div class="col-3 col-m-6 col-sm-6">
-            <a href="{% url 'customer-work-details' 'Repairing' %}" class="text-decoration-none">
-                <div class="counter bg-warning">
+            <a href="{% url 'customer-work-details' 'Repairing' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #FFC107; color: black;">
                     <p>
                         <i class="fas fa-spinner"></i>
                     </p>
@@ -35,8 +53,8 @@
 
         <!-- Work Completed -->
         <div class="col-3 col-m-6 col-sm-6">
-            <a href="{% url 'customer-work-details' 'Repairing Done' %}" class="text-decoration-none">
-                <div class="counter bg-success">
+            <a href="{% url 'customer-work-details' 'Repairing Done' %}" style="text-decoration: none;">
+                <div class="counter" style="background-color: #28A745; color: white;">
                     <p>
                         <i class="fas fa-check-circle"></i>
                     </p>
@@ -48,7 +66,7 @@
 
         <!-- Total Bill -->
         <div class="col-3 col-m-6 col-sm-6">
-            <div class="counter bg-danger">
+            <div class="counter" style="background-color: #DC3545; color: white;">
                 <p>
                     <i class="fas fa-rupee-sign"></i>
                 </p>
@@ -73,10 +91,16 @@
         <img src="{% static 'images/suzuki.png' %}" width="120" height="80" alt="suzuki" />
     </marquee>
 
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    <!-- ****** cards end ********** -->
-
 </div>
 <!-- end main content -->
+<style>
+    /* Smooth hover effect for all counter cards */
+    .counter {
+        transition: transform 0.2s ease;
+    }
 
-{% endblock content %}
+    .counter:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
