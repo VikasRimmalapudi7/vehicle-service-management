@@ -242,20 +242,17 @@ def delete_mechanic_view(request,pk):
 def admin_add_mechanic_view(request):
     userForm=forms.MechanicUserForm()
     mechanicForm=forms.MechanicForm()
-    mechanicSalary=forms.MechanicSalaryForm()
-    mydict={'userForm':userForm,'mechanicForm':mechanicForm,'mechanicSalary':mechanicSalary}
+    mydict={'userForm':userForm,'mechanicForm':mechanicForm}
     if request.method=='POST':
         userForm=forms.MechanicUserForm(request.POST)
         mechanicForm=forms.MechanicForm(request.POST,request.FILES)
-        mechanicSalary=forms.MechanicSalaryForm(request.POST)
-        if userForm.is_valid() and mechanicForm.is_valid() and mechanicSalary.is_valid():
+        if userForm.is_valid() and mechanicForm.is_valid():
             user=userForm.save()
             user.set_password(user.password)
             user.save()
             mechanic=mechanicForm.save(commit=False)
             mechanic.user=user
             mechanic.status=True
-            mechanic.salary=mechanicSalary.cleaned_data['salary']
             mechanic.save()
             my_mechanic_group = Group.objects.get_or_create(name='MECHANIC')
             my_mechanic_group[0].user_set.add(user)
@@ -297,25 +294,6 @@ def update_mechanic_view(request,pk):
             mechanicForm.save()
             return redirect('admin-view-mechanic')
     return render(request,'vehicle/update_mechanic.html',context=mydict)
-
-@login_required(login_url='adminlogin')
-def admin_view_mechanic_salary_view(request):
-    mechanics=models.Mechanic.objects.all()
-    return render(request,'vehicle/admin_view_mechanic_salary.html',{'mechanics':mechanics})
-
-@login_required(login_url='adminlogin')
-def update_salary_view(request,pk):
-    mechanicSalary=forms.MechanicSalaryForm()
-    if request.method=='POST':
-        mechanicSalary=forms.MechanicSalaryForm(request.POST)
-        if mechanicSalary.is_valid():
-            mechanic=models.Mechanic.objects.get(id=pk)
-            mechanic.salary=mechanicSalary.cleaned_data['salary']
-            mechanic.save()
-        else:
-            print("form is invalid")
-        return HttpResponseRedirect('/admin-view-mechanic-salary')
-    return render(request,'vehicle/admin_approve_mechanic_details.html',{'mechanicSalary':mechanicSalary})
 
 
 @login_required(login_url='adminlogin')
@@ -439,51 +417,6 @@ def update_cost_view(request,pk):
         return HttpResponseRedirect('/admin-view-service-cost')
     return render(request,'vehicle/update_cost.html',{'updateCostForm':updateCostForm})
 
-
-
-@login_required(login_url='adminlogin')
-def admin_mechanic_attendance_view(request):
-    return render(request,'vehicle/admin_mechanic_attendance.html')
-
-
-@login_required(login_url='adminlogin')
-def admin_take_attendance_view(request):
-    mechanics=models.Mechanic.objects.all().filter(status=True)
-    aform=forms.AttendanceForm()
-    if request.method=='POST':
-        form=forms.AttendanceForm(request.POST)
-        if form.is_valid():
-            Attendances=request.POST.getlist('present_status')
-            date=form.cleaned_data['date']
-            for i in range(len(Attendances)):
-                AttendanceModel=models.Attendance()
-                
-                AttendanceModel.date=date
-                AttendanceModel.present_status=Attendances[i]
-                print(mechanics[i].id)
-                print(int(mechanics[i].id))
-                mechanic=models.Mechanic.objects.get(id=int(mechanics[i].id))
-                AttendanceModel.mechanic=mechanic
-                AttendanceModel.save()
-            return redirect('admin-view-attendance')
-        else:
-            print('form invalid')
-    return render(request,'vehicle/admin_take_attendance.html',{'mechanics':mechanics,'aform':aform})
-
-@login_required(login_url='adminlogin')
-def admin_view_attendance_view(request):
-    form=forms.AskDateForm()
-    if request.method=='POST':
-        form=forms.AskDateForm(request.POST)
-        if form.is_valid():
-            date=form.cleaned_data['date']
-            attendancedata=models.Attendance.objects.all().filter(date=date)
-            mechanicdata=models.Mechanic.objects.all().filter(status=True)
-            mylist=zip(attendancedata,mechanicdata)
-            return render(request,'vehicle/admin_view_attendance_page.html',{'mylist':mylist,'date':date})
-        else:
-            print('form invalid')
-    return render(request,'vehicle/admin_view_attendance_ask_date.html',{'form':form})
 
 @login_required(login_url='adminlogin')
 def admin_report_view(request):
@@ -840,14 +773,6 @@ def subscribe_to_premium_view(request):
     return render(request, 'vehicle/subscribe_to_premium.html', {'form': form})
 
 
-
-@login_required(login_url='mechaniclogin')
-@user_passes_test(is_mechanic)
-def mechanic_attendance_view(request):
-    mechanic=models.Mechanic.objects.get(user_id=request.user.id)
-    attendaces=models.Attendance.objects.all().filter(mechanic=mechanic)
-    return render(request,'vehicle/mechanic_view_attendance.html',{'attendaces':attendaces,'mechanic':mechanic})
-
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
 def mechanic_feedback_view(request):
@@ -862,12 +787,7 @@ def mechanic_feedback_view(request):
         return render(request,'vehicle/feedback_sent.html',{'mechanic':mechanic})
     return render(request,'vehicle/mechanic_feedback.html',{'feedback':feedback,'mechanic':mechanic})
 
-@login_required(login_url='mechaniclogin')
-@user_passes_test(is_mechanic)
-def mechanic_salary_view(request):
-    mechanic=models.Mechanic.objects.get(user_id=request.user.id)
-    workdone=models.Request.objects.all().filter(mechanic_id=mechanic.id).filter(Q(status="Repairing Done") | Q(status="Released"))
-    return render(request,'vehicle/mechanic_salary.html',{'workdone':workdone,'mechanic':mechanic})
+
 
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)

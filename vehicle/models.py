@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import timedelta
 
 # Create your models here.
 class Customer(models.Model):
@@ -8,10 +7,9 @@ class Customer(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pic/CustomerProfilePic/', null=True, blank=True)
     address = models.CharField(max_length=100, null=True, blank=True)
     mobile = models.CharField(max_length=20, null=False)
-    
+
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
-
 
 class Mechanic(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,10 +27,9 @@ class Mechanic(models.Model):
     )
     subscription_date = models.DateField(null=True, blank=True)
     subscription_end_date = models.DateField(null=True, blank=True)
-    
+
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
-
 
 
 class Request(models.Model):
@@ -53,12 +50,7 @@ class Request(models.Model):
     status = models.CharField(max_length=50, choices=stat, default='Pending', null=True)
     address = models.CharField(max_length=100, null=True, blank=True)  
 
-class Attendance(models.Model):
-    mechanic=models.ForeignKey('Mechanic',on_delete=models.CASCADE,null=True)
-    date=models.DateField()
-    present_status = models.CharField(max_length=10)
-
 class Feedback(models.Model):
-    date=models.DateField(auto_now=True)
-    by=models.CharField(max_length=40)
-    message=models.CharField(max_length=500)
+    date = models.DateField(auto_now=True)
+    by = models.CharField(max_length=40)
+    message = models.CharField(max_length=500)

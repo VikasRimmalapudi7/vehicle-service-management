@@ -12,12 +12,10 @@ class CustomerUserForm(forms.ModelForm):
             'password': forms.PasswordInput()
         }
 
-
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = models.Customer
         fields = ['address', 'mobile', 'profile_pic']
-
 
 class MechanicUserForm(forms.ModelForm):
     class Meta:
@@ -27,16 +25,10 @@ class MechanicUserForm(forms.ModelForm):
             'password': forms.PasswordInput()
         }
 
-
 class MechanicForm(forms.ModelForm):
     class Meta:
         model = models.Mechanic
         fields = ['address', 'mobile', 'profile_pic', 'skill']
-
-
-class MechanicSalaryForm(forms.Form):
-    salary = forms.IntegerField()
-
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -48,7 +40,6 @@ class RequestForm(forms.ModelForm):
         widgets = {
             'problem_description': forms.Textarea(attrs={'rows': 3, 'cols': 30})
         }
-
 
 class AdminRequestForm(forms.Form):
     customer = forms.ModelChoiceField(
@@ -62,7 +53,6 @@ class AdminRequestForm(forms.Form):
         to_field_name='id'
     )
     cost = forms.IntegerField()
-
 
 class AdminApproveRequestForm(forms.Form):
     mechanic = forms.ModelChoiceField(
@@ -79,13 +69,8 @@ class AdminApproveRequestForm(forms.Form):
     )
     status = forms.ChoiceField(choices=stat)
 
-
-
 class UpdateCostForm(forms.Form):
     cost = forms.IntegerField()
-
-
-# -------------------- Updated Mechanic Status Form -----------------------
 
 class MechanicUpdateStatusForm(forms.ModelForm):
     class Meta:
@@ -110,10 +95,6 @@ class SubscriptionForm(forms.Form):
     cvv = forms.CharField(max_length=3, label="CVV", widget=forms.PasswordInput())
     plan = forms.ChoiceField(choices=PLAN_CHOICES, label="Subscription Plan")
 
-
-
-# -------------------- Feedback and Other Forms -----------------------
-
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = models.Feedback
@@ -121,24 +102,3 @@ class FeedbackForm(forms.ModelForm):
         widgets = {
             'message': forms.Textarea(attrs={'rows': 6, 'cols': 30})
         }
-
-
-presence_choices = (('Present', 'Present'), ('Absent', 'Absent'))
-
-
-class AttendanceForm(forms.Form):
-    present_status = forms.ChoiceField(choices=presence_choices)
-    date = forms.DateField()
-
-
-class AskDateForm(forms.Form):
-    date = forms.DateField()
-
-
-class ContactusForm(forms.Form):
-    Name = forms.CharField(max_length=30)
-    Email = forms.EmailField()
-    Message = forms.CharField(
-        max_length=500,
-        widget=forms.Textarea(attrs={'rows': 3, 'cols': 30})
-    )
