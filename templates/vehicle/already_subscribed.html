@@ -1,34 +1,80 @@
 {% extends 'vehicle/mechanicbase.html' %}
 {% block content %}
+
+<!-- Page Wrapper with Extra Padding -->
 <div style="
     display: flex; 
     justify-content: center; 
-    align-items: center; 
-    height: 100vh; 
-    text-align: center;
-    background-color: #f9fafb;">
+    align-items: flex-start; 
+    min-height: 100vh; 
+    padding-top: 150px; 
+    background-color: #f9fafb;
+    text-align: center;">
+    
     <div>
-        <div class="alert alert-info" style="max-width: 500px; margin: auto; padding: 20px; border-radius: 10px;">
-            <h4 style="margin-bottom: 20px;">You are already subscribed to Premium!</h4>
-            <p>Thank you for being a premium member. Enjoy exclusive benefits.</p>
+        <h2>You are already subscribed to Premium!</h2>
+        <p>Thank you for being a premium member. Enjoy exclusive benefits.</p>
+
+        <!-- Subscription Details Block -->
+        <div style="
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            max-width: 500px; 
+            margin: 30px auto; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h4 style="color: #1D4ED8; font-weight: bold;">Current Plan Details</h4>
+            <p><strong>Plan Type:</strong> {{ plan_text }}</p>
+            <p><strong>Subscription Start Date:</strong> {{ subscription_date|date:"F d, Y" }}</p>
+            <p><strong>Subscription End Date:</strong> {{ subscription_end_date|date:"F d, Y" }}</p>
+            <p><strong>Remaining Days:</strong> {{ remaining_days }} days</p>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 20px;">
-            <a href="{% url 'mechanic-dashboard' %}" style="
-                display: inline-block;
-                width: 200px;
-                padding: 12px 20px;
-                text-align: center;
-                text-decoration: none;
-                background-color: #3B82F6;
-                color: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s ease;
-            " onmouseover="this.style.backgroundColor='#2563eb'; this.style.boxShadow='0 6px 8px rgba(0, 0, 0, 0.15)';"
-               onmouseout="this.style.backgroundColor='#3B82F6'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
-                Back to Dashboard
-            </a>
+
+        <!-- Renewal Form -->
+        <div style="
+            background: #f9fafb; 
+            padding: 20px; 
+            margin: 30px auto; 
+            border-radius: 8px; 
+            max-width: 500px;">
+            <h4>Renew Your Subscription</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="plan">Select Renewal Plan</label>
+                {{ form.plan }}
+                <button type="submit" style="
+                    width: 100%; 
+                    padding: 12px; 
+                    background-color: #3B82F6; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 6px; 
+                    font-size: 16px; 
+                    font-weight: 600; 
+                    cursor: pointer; 
+                    transition: all 0.3s ease;">
+                    Renew Now
+                </button>
+            </form>
         </div>
+
+        <!-- Back to Dashboard Button -->
+        <a href="{% url 'mechanic-dashboard' %}" style="
+            display: inline-block;
+            width: 200px;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            background-color: #3B82F6;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;"
+           onmouseover="this.style.backgroundColor='#2563eb'; this.style.boxShadow='0 6px 8px rgba(0, 0, 0, 0.15)';"
+           onmouseout="this.style.backgroundColor='#3B82F6'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
+            Back to Dashboard
+        </a>
     </div>
 </div>
+
 {% endblock %}

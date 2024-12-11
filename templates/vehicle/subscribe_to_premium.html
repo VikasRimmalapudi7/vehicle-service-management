@@ -1,11 +1,13 @@
 {% extends 'vehicle/mechanicbase.html' %}
 {% block content %}
+
 <div style="
     display: flex; 
     justify-content: center; 
     align-items: center; 
     height: 100vh; 
     background-color: #f9fafb;">
+    
     <div style="
         background: white; 
         border-radius: 12px; 
@@ -13,40 +15,55 @@
         width: 100%; 
         max-width: 400px; 
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        
         <h3 style="text-align: center; color: #333; margin-bottom: 20px;">Subscribe to Premium</h3>
 
-        <!-- Price Section -->
-        <div style="
+        <!-- Plan Selection Section -->
+        <div id="price-display" style="
             text-align: center; 
             margin-bottom: 20px; 
             background-color: #EFF6FF; 
             padding: 15px; 
             border-radius: 8px; 
             border: 1px solid #3B82F6;">
-            <h4 style="margin: 0; color: #1D4ED8; font-weight: 700;">$500</h4>
-            <p style="margin: 5px 0 0; color: #2563EB; font-size: 14px;">One-Year subscription fee</p>
+            <h4 id="selected-price" style="margin: 0; color: #1D4ED8; font-weight: 700;">$1000</h4>
+            <p id="selected-plan" style="margin: 5px 0 0; color: #2563EB; font-size: 14px;">One-Year Subscription</p>
         </div>
 
         <form method="POST" style="margin: 0 auto; width: 100%;">
             {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label for="plan" style="font-weight: 600; margin-bottom: 8px; display: block;">Select Plan</label>
+                <select id="plan" name="plan" class="form-control" style="
+                    width: 100%; 
+                    padding: 10px; 
+                    border: 1px solid #ddd; 
+                    border-radius: 6px;">
+                    <option value="1" data-price="$120" data-text="One-Month Subscription">1 Month - $120</option>
+                    <option value="3" data-price="$300" data-text="Three-Month Subscription">3 Months - $300</option>
+                    <option value="12" data-price="$1000" data-text="One-Year Subscription" selected>12 Months - $1000</option>
+                </select>
+            </div>
+
             <div style="margin-bottom: 20px;">
                 <label for="id_name" style="font-weight: 600; margin-bottom: 8px; display: block;">Cardholder Name</label>
                 <input type="text" id="id_name" name="name" class="form-control" style="
                     width: 100%; 
                     padding: 10px; 
                     border: 1px solid #ddd; 
-                    border-radius: 6px; 
-                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    border-radius: 6px;">
             </div>
+            
             <div style="margin-bottom: 20px;">
                 <label for="id_card_number" style="font-weight: 600; margin-bottom: 8px; display: block;">Card Number</label>
                 <input type="text" id="id_card_number" name="card_number" class="form-control" style="
                     width: 100%; 
                     padding: 10px; 
                     border: 1px solid #ddd; 
-                    border-radius: 6px; 
-                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    border-radius: 6px;">
             </div>
+
             <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px;">
                 <div style="flex: 1;">
                     <label for="id_expiry_date" style="font-weight: 600; margin-bottom: 8px; display: block;">Expiry Date</label>
@@ -54,19 +71,19 @@
                         width: 100%; 
                         padding: 10px; 
                         border: 1px solid #ddd; 
-                        border-radius: 6px; 
-                        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                        border-radius: 6px;">
                 </div>
+                
                 <div style="flex: 0.5;">
                     <label for="id_cvv" style="font-weight: 600; margin-bottom: 8px; display: block;">CVV</label>
                     <input type="password" id="id_cvv" name="cvv" class="form-control" style="
                         width: 100%; 
                         padding: 10px; 
                         border: 1px solid #ddd; 
-                        border-radius: 6px; 
-                        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                        border-radius: 6px;">
                 </div>
             </div>
+
             <button type="submit" style="
                 width: 100%; 
                 padding: 12px; 
@@ -83,4 +100,13 @@
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('plan').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    document.getElementById('selected-price').innerText = selectedOption.dataset.price;
+    document.getElementById('selected-plan').innerText = selectedOption.dataset.text;
+});
+</script>
+
 {% endblock %}

@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import timedelta
+
 # Create your models here.
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -17,9 +19,16 @@ class Mechanic(models.Model):
     address = models.CharField(max_length=100, null=True, blank=True)
     mobile = models.CharField(max_length=20, null=False)
     skill = models.CharField(max_length=500, null=True)
-    salary = models.PositiveIntegerField(null=True)
     status = models.BooleanField(default=False)  # No auto-approval
     premium = models.BooleanField(default=False)
+    subscription_plan = models.CharField(
+        max_length=20, 
+        choices=[('1', '1 Month'), ('3', '3 Months'), ('12', '1 Year')], 
+        null=True, 
+        blank=True
+    )
+    subscription_date = models.DateField(null=True, blank=True)
+    subscription_end_date = models.DateField(null=True, blank=True)
     
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"

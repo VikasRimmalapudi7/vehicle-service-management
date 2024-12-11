@@ -99,10 +99,17 @@ class MechanicUpdateStatusForm(forms.ModelForm):
         }
 
 class SubscriptionForm(forms.Form):
+    PLAN_CHOICES = [
+        ('1', '1 Month - $120'),
+        ('3', '3 Months - $300'),
+        ('12', '12 Months - $1000'),
+    ]
     name = forms.CharField(max_length=100, label="Cardholder Name")
     card_number = forms.CharField(max_length=16, label="Card Number")
     expiry_date = forms.DateField(label="Expiry Date", widget=forms.TextInput(attrs={'type': 'date'}))
     cvv = forms.CharField(max_length=3, label="CVV", widget=forms.PasswordInput())
+    plan = forms.ChoiceField(choices=PLAN_CHOICES, label="Subscription Plan")
+
 
 
 # -------------------- Feedback and Other Forms -----------------------

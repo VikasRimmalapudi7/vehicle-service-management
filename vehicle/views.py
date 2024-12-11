@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.shortcuts import render,redirect,reverse
 from . import forms,models
 from django.db.models import Sum
@@ -7,6 +8,7 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from django.conf import settings
 from django.db.models import Q
 from django.db import connection
+from django.utils import timezone
 
 
 def home_view(request):
@@ -218,19 +220,13 @@ def admin_approve_mechanic_view(request):
     return render(request,'vehicle/admin_approve_mechanic.html',{'mechanics':mechanics})
 
 @login_required(login_url='adminlogin')
-def approve_mechanic_view(request,pk):
-    mechanicSalary=forms.MechanicSalaryForm()
-    if request.method=='POST':
-        mechanicSalary=forms.MechanicSalaryForm(request.POST)
-        if mechanicSalary.is_valid():
-            mechanic=models.Mechanic.objects.get(id=pk)
-            mechanic.salary=mechanicSalary.cleaned_data['salary']
-            mechanic.status=True
-            mechanic.save()
-        else:
-            print("form is invalid")
+def approve_mechanic_view(request, pk):
+    mechanic = models.Mechanic.objects.get(id=pk)
+    if request.method == 'POST':
+        mechanic.status = True
+        mechanic.save()
         return HttpResponseRedirect('/admin-approve-mechanic')
-    return render(request,'vehicle/admin_approve_mechanic_details.html',{'mechanicSalary':mechanicSalary})
+    return render(request, 'vehicle/admin_approve_mechanic_details.html', {'mechanic': mechanic})
 
 
 @login_required(login_url='adminlogin')
@@ -698,7 +694,6 @@ def mechanic_dashboard_view(request):
         'work_in_progress': work_in_progress,
         'work_completed': work_completed,
         'new_work_assigned': new_work_assigned,
-        'salary': mechanic.salary,
         'mechanic': mechanic,
         'total_earnings': total_earnings,  # Add total earnings to context
     }
@@ -788,27 +783,61 @@ def mechanic_work_assigned_view(request):
     })
 
 
+from datetime import timedelta
+from django.utils import timezone
+
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
 def subscribe_to_premium_view(request):
     mechanic = models.Mechanic.objects.get(user_id=request.user.id)
-    
-    # Check if the mechanic is already subscribed
-    if mechanic.premium:
-        return render(request, 'vehicle/already_subscribed.html', {'mechanic': mechanic})
 
+    # Subscription Details if Already Subscribed
+    if mechanic.premium:
+        plan_text = dict(forms.SubscriptionForm.PLAN_CHOICES).get(mechanic.subscription_plan, "Unknown")
+        remaining_days = (mechanic.subscription_end_date - timezone.now().date()).days
+
+        context = {
+            'mechanic': mechanic,
+            'plan_text': plan_text,
+            'subscription_date': mechanic.subscription_date,
+            'subscription_end_date': mechanic.subscription_end_date,
+            'remaining_days': remaining_days
+        }
+
+        # Handle renewal
+        if request.method == 'POST':
+            form = forms.SubscriptionForm(request.POST)
+            if form.is_valid():
+                selected_plan = form.cleaned_data['plan']
+                plan_durations = {'1': 30, '3': 90, '12': 365}
+
+                # Renew subscription
+                mechanic.subscription_plan = selected_plan
+                mechanic.subscription_date = timezone.now().date()
+                mechanic.subscription_end_date += timedelta(days=plan_durations[selected_plan])
+                mechanic.save()
+                return redirect('mechanic-dashboard')
+
+        context['form'] = forms.SubscriptionForm()
+        return render(request, 'vehicle/already_subscribed.html', context)
+
+    # New Subscription
     form = forms.SubscriptionForm()
     if request.method == 'POST':
         form = forms.SubscriptionForm(request.POST)
         if form.is_valid():
-            # For now, assume successful payment (no payment gateway integration)
+            selected_plan = form.cleaned_data['plan']
+            plan_durations = {'1': 30, '3': 90, '12': 365}
+
+            # Set Subscription Details
             mechanic.premium = True
+            mechanic.subscription_plan = selected_plan
+            mechanic.subscription_date = timezone.now().date()
+            mechanic.subscription_end_date = mechanic.subscription_date + timedelta(days=plan_durations[selected_plan])
             mechanic.save()
-            return redirect('mechanic-dashboard')  # Redirect after subscription
+            return redirect('mechanic-dashboard')
 
     return render(request, 'vehicle/subscribe_to_premium.html', {'form': form})
-
-
 
 
 
@@ -818,10 +847,6 @@ def mechanic_attendance_view(request):
     mechanic=models.Mechanic.objects.get(user_id=request.user.id)
     attendaces=models.Attendance.objects.all().filter(mechanic=mechanic)
     return render(request,'vehicle/mechanic_view_attendance.html',{'attendaces':attendaces,'mechanic':mechanic})
-
-
-
-
 
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
