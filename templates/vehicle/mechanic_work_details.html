@@ -14,6 +14,7 @@
             <th>Problem Description</th>
             <th>Service Date</th>
             <th>Status</th>
+            <th>Repair Cost</th> <!-- New Column -->
             <th>Action</th>
         </tr>
     </thead>
@@ -28,6 +29,7 @@
             <td>{{ work.problem_description }}</td>
             <td>{{ work.date }}</td>
             <td>{{ work.status }}</td>
+            <td>{{ work.cost }}</td> <!-- Display Repair Cost -->
             <td>
                 <a href="{% url 'mechanic-update-status' work.id %}" class="btn btn-success">Update</a>
             </td>
@@ -60,5 +62,4 @@
         Back to Dashboard
     </a>
 </div>
-
 {% endblock %}

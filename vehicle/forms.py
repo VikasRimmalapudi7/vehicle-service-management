@@ -70,7 +70,6 @@ class AdminApproveRequestForm(forms.Form):
         empty_label="Mechanic Name",
         to_field_name='id'
     )
-    cost = forms.IntegerField()
     stat = (
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
@@ -79,6 +78,7 @@ class AdminApproveRequestForm(forms.Form):
         ('Released', 'Released')
     )
     status = forms.ChoiceField(choices=stat)
+
 
 
 class UpdateCostForm(forms.Form):

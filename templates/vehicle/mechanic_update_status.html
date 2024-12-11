@@ -3,7 +3,6 @@
 {% block content %}
 
 <style>
-  /* Simplified and improved styling for the form */
   .form-container {
     width: 60%;
     margin: 50px auto;
@@ -21,7 +20,8 @@
 
   .form-container input[type="text"],
   .form-container select,
-  .form-container textarea {
+  .form-container textarea,
+  .form-container input[type="number"] {
     width: 100%;
     padding: 10px;
     margin: 10px 0 20px;
@@ -50,11 +50,33 @@
 <div class="form-container">
   <form method="post">
     {% csrf_token %}
+
     <label for="status">Status</label>
     {% render_field updateStatus.status class="form-control" %}
+
+    <div id="cost-input" style="display: none;">
+      <label for="cost">Repair Cost</label>
+      <input type="number" id="cost" name="cost" min="0" placeholder="Enter repair cost">
+    </div>
+
+    {% if error %}
+      <p style="color: red;">{{ error }}</p>
+    {% endif %}
 
     <input type="submit" value="Update Status">
   </form>
 </div>
+
+<script>
+  // Show/hide cost field based on status
+  document.querySelector('[name="status"]').addEventListener('change', function() {
+    const costInput = document.getElementById('cost-input');
+    if (this.value === 'Repairing Done') {
+      costInput.style.display = 'block';
+    } else {
+      costInput.style.display = 'none';
+    }
+  });
+</script>
 
 {% endblock %}

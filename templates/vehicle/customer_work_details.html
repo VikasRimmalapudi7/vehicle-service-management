@@ -14,6 +14,8 @@
             <th>Assigned Mechanic</th>
             <th>Mechanic Phone</th>
             <th>Status</th>
+            <th>Bill</th>
+
         </tr>
     </thead>
     <tbody>
@@ -39,6 +41,13 @@
                 {% endif %}
             </td>
             <td>{{ work.status }}</td>
+            <td>
+                {% if work.status == 'Repairing Done' %}
+                    {{ work.cost|default:"Not Available" }}
+                {% else %}
+                    Not Applicable
+                {% endif %}
+            </td>
         </tr>
         {% empty %}
         <tr>

@@ -16,6 +16,7 @@
 							<thead>
 								<tr>
 									<th>Name</th>
+									<th>Premium Subscriber</th>
 									<th>Profile Picture</th>
 									<th>Mobile</th>
 									<th>Address</th>
@@ -30,7 +31,7 @@
 								<tr>
 									<!-- Updated to display first and last name of the related user -->
 									<td>{{ m.user.first_name }} {{ m.user.last_name }}</td>
-
+                                    <td>{{ m.premium|yesno:"Yes,No" }}</td>
 									<!-- Updated to handle potential missing profile picture -->
 									<td> <img src="{% static m.profile_pic.url %}" alt="Profile Pic" height="40px" width="40px" /></td>
 

@@ -271,8 +271,8 @@ def admin_add_mechanic_view(request):
 
 @login_required(login_url='adminlogin')
 def admin_view_mechanic_view(request):
-    mechanics=models.Mechanic.objects.all()
-    return render(request,'vehicle/admin_view_mechanic.html',{'mechanics':mechanics})
+    mechanics = models.Mechanic.objects.all()
+    return render(request, 'vehicle/admin_view_mechanic.html', {'mechanics': mechanics})
 
 
 @login_required(login_url='adminlogin')
@@ -337,20 +337,30 @@ def admin_view_request_view(request):
 
 
 @login_required(login_url='adminlogin')
-def change_status_view(request,pk):
-    adminenquiry=forms.AdminApproveRequestForm()
-    if request.method=='POST':
-        adminenquiry=forms.AdminApproveRequestForm(request.POST)
-        if adminenquiry.is_valid():
-            enquiry_x=models.Request.objects.get(id=pk)
-            enquiry_x.mechanic=adminenquiry.cleaned_data['mechanic']
-            enquiry_x.cost=adminenquiry.cleaned_data['cost']
-            enquiry_x.status=adminenquiry.cleaned_data['status']
-            enquiry_x.save()
-        else:
-            print("form is invalid")
+def change_status_view(request, pk):
+    enquiry_x = models.Request.objects.get(id=pk)
+
+    # Prevent changes if status is not pending
+    if enquiry_x.status != 'Pending':
         return HttpResponseRedirect('/admin-view-request')
-    return render(request,'vehicle/admin_approve_request_details.html',{'adminenquiry':adminenquiry})
+
+    # Initialize form with existing data
+    adminenquiry = forms.AdminApproveRequestForm(initial={
+        'mechanic': enquiry_x.mechanic,
+        'status': enquiry_x.status,
+    })
+
+    if request.method == 'POST':
+        adminenquiry = forms.AdminApproveRequestForm(request.POST)
+        if adminenquiry.is_valid():
+            enquiry_x.mechanic = adminenquiry.cleaned_data['mechanic']
+            enquiry_x.status = adminenquiry.cleaned_data['status']
+            enquiry_x.save()
+            return HttpResponseRedirect('/admin-view-request')
+
+    return render(request, 'vehicle/admin_approve_request_details.html', {'adminenquiry': adminenquiry})
+
+
 
 
 @login_required(login_url='adminlogin')
@@ -669,21 +679,32 @@ def customer_feedback_view(request):
 #============================================================================================
 
 
+from django.db.models import Sum  # Ensure this is imported
+
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
 def mechanic_dashboard_view(request):
-    mechanic=models.Mechanic.objects.get(user_id=request.user.id)
-    work_in_progress=models.Request.objects.all().filter(mechanic_id=mechanic.id,status='Repairing').count()
-    work_completed=models.Request.objects.all().filter(mechanic_id=mechanic.id,status='Repairing Done').count()
-    new_work_assigned=models.Request.objects.all().filter(mechanic_id=mechanic.id,status='Approved').count()
-    dict={
-    'work_in_progress':work_in_progress,
-    'work_completed':work_completed,
-    'new_work_assigned':new_work_assigned,
-    'salary':mechanic.salary,
-    'mechanic':mechanic,
+    mechanic = models.Mechanic.objects.get(user_id=request.user.id)
+    work_in_progress = models.Request.objects.filter(mechanic_id=mechanic.id, status='Repairing').count()
+    work_completed = models.Request.objects.filter(mechanic_id=mechanic.id, status='Repairing Done').count()
+    new_work_assigned = models.Request.objects.filter(mechanic_id=mechanic.id, status='Approved').count()
+
+    # Calculate total earnings
+    total_earnings = models.Request.objects.filter(mechanic_id=mechanic.id, status='Repairing Done').aggregate(
+        total=Sum('cost')
+    )['total'] or 0
+
+    dict = {
+        'work_in_progress': work_in_progress,
+        'work_completed': work_completed,
+        'new_work_assigned': new_work_assigned,
+        'salary': mechanic.salary,
+        'mechanic': mechanic,
+        'total_earnings': total_earnings,  # Add total earnings to context
     }
-    return render(request,'vehicle/mechanic_dashboard.html',context=dict)
+    return render(request, 'vehicle/mechanic_dashboard.html', context=dict)
+
+
 
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
@@ -701,33 +722,45 @@ def mechanic_work_details_view(request, status):
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
 def mechanic_update_status_view(request, pk):
-    # Get the mechanic
     mechanic = models.Mechanic.objects.get(user_id=request.user.id)
-
-    # Fetch the request object
+    
     try:
         request_obj = models.Request.objects.get(id=pk)
     except models.Request.DoesNotExist:
-        return redirect('mechanic-work-assigned')  # Handle invalid access
+        return redirect('mechanic-work-assigned')  # Redirect to assigned works
 
     if request.method == 'POST':
         updateStatus = forms.MechanicUpdateStatusForm(request.POST, instance=request_obj)
         if updateStatus.is_valid():
-            # Update mechanic assignment if not already assigned
+            # Check if the status is "Repairing Done"
+            if updateStatus.cleaned_data['status'] == 'Repairing Done':
+                cost = request.POST.get('cost')
+                if not cost:
+                    # If cost is not provided, reload the form with an error message
+                    return render(request, 'vehicle/mechanic_update_status.html', {
+                        'updateStatus': updateStatus,
+                        'mechanic': mechanic,
+                        'error': "Cost is required when marking status as 'Repairing Done'."
+                    })
+                request_obj.cost = cost  # Assign the cost to the request object
+            
+            # Assign the mechanic if not already assigned
             if request_obj.mechanic is None:
                 request_obj.mechanic = mechanic
 
-            # Save the updated status
+            # Save the changes
             updateStatus.save()
             return redirect('mechanic-work-assigned')
         else:
-            print("Form Errors:", updateStatus.errors)  # Debugging
-
+            print("Form errors:", updateStatus.errors)
+    
     updateStatus = forms.MechanicUpdateStatusForm(instance=request_obj)
     return render(request, 'vehicle/mechanic_update_status.html', {
         'updateStatus': updateStatus,
         'mechanic': mechanic,
     })
+
+
 
 
 @login_required(login_url='mechaniclogin')
@@ -740,14 +773,14 @@ def mechanic_work_assigned_view(request):
         return render(request, 'vehicle/no_access.html')  # Redirect to no access page if not premium
 
     # Fetch requests assigned to premium mechanics
-    works = models.Request.objects.filter(
+    works = models.Request.objects.filter(address=mechanic.address,
         mechanic=mechanic
     ).exclude(status__in=['Repairing Done', 'Released'])  # Exclude completed requests
 
     # You may want to add additional logic if premium mechanics should see all requests
     # Example: If they should also see unassigned requests (those without a mechanic assigned)
     if mechanic.premium:
-        works = works | models.Request.objects.filter(mechanic__isnull=True)
+        works = works | models.Request.objects.filter(address=mechanic.address,mechanic__isnull=True)
 
     return render(request, 'vehicle/mechanic_work_assigned.html', {
         'works': works,
