@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Subscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff512f, #dd2476);
+            color: white;
+            text-align: center;
+            padding: 2em;
+        }
+        .subscription-box {
+            background: #222;
+            padding: 2em;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .btn {
+            background: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #c2185b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mechanic Premium Subscription</h1>
+    <div class="subscription-box">
+        <h2>Upgrade to Premium</h2>
+        <p>Enjoy more benefits by subscribing to our premium service.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn">Proceed to Payment</button>
+        </form>
+    </div>
+</body>
+</html>

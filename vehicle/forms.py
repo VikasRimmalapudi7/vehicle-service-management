@@ -98,6 +98,12 @@ class MechanicUpdateStatusForm(forms.ModelForm):
             )
         }
 
+class SubscriptionForm(forms.Form):
+    name = forms.CharField(max_length=100, label="Cardholder Name")
+    card_number = forms.CharField(max_length=16, label="Card Number")
+    expiry_date = forms.DateField(label="Expiry Date", widget=forms.TextInput(attrs={'type': 'date'}))
+    cvv = forms.CharField(max_length=3, label="CVV", widget=forms.PasswordInput())
+
 
 # -------------------- Feedback and Other Forms -----------------------
 

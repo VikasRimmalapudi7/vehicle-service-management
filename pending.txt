@@ -12,5 +12,5 @@ logout functionality is not there
 add redirection in the admin page for total customer total mechanic
 
 
-bill section is not working
+bill section and feedback is not working
 admin dashboard needs to be optimised

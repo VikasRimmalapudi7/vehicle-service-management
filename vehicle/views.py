@@ -56,23 +56,32 @@ def customer_signup_view(request):
 
 
 def mechanic_signup_view(request):
-    userForm=forms.MechanicUserForm()
-    mechanicForm=forms.MechanicForm()
-    mydict={'userForm':userForm,'mechanicForm':mechanicForm}
-    if request.method=='POST':
-        userForm=forms.MechanicUserForm(request.POST)
-        mechanicForm=forms.MechanicForm(request.POST,request.FILES)
+    userForm = forms.MechanicUserForm()
+    mechanicForm = forms.MechanicForm()
+    mydict = {'userForm': userForm, 'mechanicForm': mechanicForm}
+    
+    if request.method == 'POST':
+        userForm = forms.MechanicUserForm(request.POST)
+        mechanicForm = forms.MechanicForm(request.POST, request.FILES)
+        
         if userForm.is_valid() and mechanicForm.is_valid():
-            user=userForm.save()
+            user = userForm.save()
             user.set_password(user.password)
             user.save()
-            mechanic=mechanicForm.save(commit=False)
-            mechanic.user=user
+            
+            mechanic = mechanicForm.save(commit=False)
+            mechanic.user = user
+            # No auto-approval
             mechanic.save()
+            
+            # Assign to MECHANIC group
             my_mechanic_group = Group.objects.get_or_create(name='MECHANIC')
             my_mechanic_group[0].user_set.add(user)
-        return HttpResponseRedirect('mechaniclogin')
-    return render(request,'vehicle/mechanicsignup.html',context=mydict)
+            
+            return HttpResponseRedirect('mechaniclogin')
+    
+    return render(request, 'vehicle/mechanicsignup.html', context=mydict)
+
 
 
 #for checking user customer, mechanic or admin(by sumit)
@@ -86,13 +95,14 @@ def afterlogin_view(request):
     if is_customer(request.user):
         return redirect('customer-dashboard')
     elif is_mechanic(request.user):
-        accountapproval=models.Mechanic.objects.all().filter(user_id=request.user.id,status=True)
-        if accountapproval:
+        mechanic = models.Mechanic.objects.filter(user_id=request.user.id).first()
+        if mechanic and mechanic.status:  # Only approved mechanics proceed
             return redirect('mechanic-dashboard')
         else:
-            return render(request,'vehicle/mechanic_wait_for_approval.html')
+            return render(request, 'vehicle/mechanic_wait_for_approval.html')
     else:
         return redirect('admin-dashboard')
+
 
 
 
@@ -353,23 +363,26 @@ def admin_delete_request_view(request,pk):
 
 @login_required(login_url='adminlogin')
 def admin_add_request_view(request):
-    enquiry=forms.RequestForm()
-    adminenquiry=forms.AdminRequestForm()
-    mydict={'enquiry':enquiry,'adminenquiry':adminenquiry}
-    if request.method=='POST':
-        enquiry=forms.RequestForm(request.POST)
-        adminenquiry=forms.AdminRequestForm(request.POST)
+    enquiry = forms.RequestForm()
+    adminenquiry = forms.AdminRequestForm()
+    premium_mechanics = models.Mechanic.objects.filter(premium=True)
+
+    adminenquiry.fields['mechanic'].queryset = premium_mechanics  # Only premium mechanics
+
+    if request.method == 'POST':
+        enquiry = forms.RequestForm(request.POST)
+        adminenquiry = forms.AdminRequestForm(request.POST)
         if enquiry.is_valid() and adminenquiry.is_valid():
-            enquiry_x=enquiry.save(commit=False)
-            enquiry_x.customer=adminenquiry.cleaned_data['customer']
-            enquiry_x.mechanic=adminenquiry.cleaned_data['mechanic']
-            enquiry_x.cost=adminenquiry.cleaned_data['cost']
-            enquiry_x.status='Approved'
+            enquiry_x = enquiry.save(commit=False)
+            enquiry_x.customer = adminenquiry.cleaned_data['customer']
+            enquiry_x.mechanic = adminenquiry.cleaned_data['mechanic']
+            enquiry_x.cost = adminenquiry.cleaned_data['cost']
+            enquiry_x.status = 'Approved'
             enquiry_x.save()
-        else:
-            print("form is invalid")
         return HttpResponseRedirect('admin-view-request')
-    return render(request,'vehicle/admin_add_request.html',context=mydict)
+
+    return render(request, 'vehicle/admin_add_request.html', {'enquiry': enquiry, 'adminenquiry': adminenquiry})
+
 
 @login_required(login_url='adminlogin')
 def admin_approve_request_view(request):
@@ -720,18 +733,47 @@ def mechanic_update_status_view(request, pk):
 @login_required(login_url='mechaniclogin')
 @user_passes_test(is_mechanic)
 def mechanic_work_assigned_view(request):
-    # Get the logged-in mechanic
     mechanic = models.Mechanic.objects.get(user_id=request.user.id)
 
-    # Filter works assigned to the mechanic or unassigned but matching their address
+    # Check if the mechanic is premium
+    if not mechanic.premium:
+        return render(request, 'vehicle/no_access.html')  # Redirect to no access page if not premium
+
+    # Fetch requests assigned to premium mechanics
     works = models.Request.objects.filter(
-        Q(mechanic=mechanic) | Q(mechanic=None, address=mechanic.address)
-    ).exclude(status__in=['Repairing Done', 'Released'])  # Exclude completed tasks
+        mechanic=mechanic
+    ).exclude(status__in=['Repairing Done', 'Released'])  # Exclude completed requests
+
+    # You may want to add additional logic if premium mechanics should see all requests
+    # Example: If they should also see unassigned requests (those without a mechanic assigned)
+    if mechanic.premium:
+        works = works | models.Request.objects.filter(mechanic__isnull=True)
 
     return render(request, 'vehicle/mechanic_work_assigned.html', {
         'works': works,
         'mechanic': mechanic
     })
+
+
+@login_required(login_url='mechaniclogin')
+@user_passes_test(is_mechanic)
+def subscribe_to_premium_view(request):
+    mechanic = models.Mechanic.objects.get(user_id=request.user.id)
+    
+    # Check if the mechanic is already subscribed
+    if mechanic.premium:
+        return render(request, 'vehicle/already_subscribed.html', {'mechanic': mechanic})
+
+    form = forms.SubscriptionForm()
+    if request.method == 'POST':
+        form = forms.SubscriptionForm(request.POST)
+        if form.is_valid():
+            # For now, assume successful payment (no payment gateway integration)
+            mechanic.premium = True
+            mechanic.save()
+            return redirect('mechanic-dashboard')  # Redirect after subscription
+
+    return render(request, 'vehicle/subscribe_to_premium.html', {'form': form})
 
 
 

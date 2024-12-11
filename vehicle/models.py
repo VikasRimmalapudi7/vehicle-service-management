@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='profile_pic/CustomerProfilePic/', null=True, blank=True)
-    address = models.CharField(max_length=40)
+    address = models.CharField(max_length=100, null=True, blank=True)
     mobile = models.CharField(max_length=20, null=False)
-    address = models.CharField(max_length=100, null=True, blank=True)  
+    
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
 
@@ -14,14 +14,16 @@ class Customer(models.Model):
 class Mechanic(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='profile_pic/MechanicProfilePic/', null=True, blank=True)
-    address = models.CharField(max_length=40)
+    address = models.CharField(max_length=100, null=True, blank=True)
     mobile = models.CharField(max_length=20, null=False)
     skill = models.CharField(max_length=500, null=True)
     salary = models.PositiveIntegerField(null=True)
-    status = models.BooleanField(default=False)
-    address = models.CharField(max_length=100, null=True, blank=True)
+    status = models.BooleanField(default=False)  # No auto-approval
+    premium = models.BooleanField(default=False)
+    
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
+
 
 
 class Request(models.Model):
