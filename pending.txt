@@ -10,7 +10,17 @@ imp features
 mehchanic and customer names are not rendering properly(bug should be fixed)
 logout functionality is not there
 add redirection in the admin page for total customer total mechanic
-
-
 bill section and feedback is not working
 admin dashboard needs to be optimised
+
+
+add a bill colum in http://localhost:8000/customer-work-details/Repairing%20Done/ this url for vehicles that are repaired only
+same add a bill column in http://localhost:8000/admin-view-request and admin shoud not change the status of request if it is not in pending state,admin can only change if request  is in pending state and he should see the bill of request for which repairing is done
+
+
+remove salary  and attendance block from http://localhost:8000/approve-mechanic/
+
+1 month,3 month,1 year subscription
+
+verify feedback from customers in admin 
+remove http://localhost:8000/admin-view-mechanic-salary 
